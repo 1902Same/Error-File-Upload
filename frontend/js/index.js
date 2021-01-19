@@ -1,10 +1,15 @@
 const url = "http://localhost:5000";
 var socket = io(url);
 
+
+socket.on('connect', function () {
+    console.log("connected")
+});
+
 function Signup() {
     axios({
         method: 'post',
-        url: "http://localhost:5000/signup",
+        url: url + "/signup",
         data: {
             name: document.getElementById("sname").value,
             email: document.getElementById("semail").value,
@@ -31,7 +36,7 @@ function Signup() {
 function Login() {
     axios({
         method: 'post',
-        url: "http://localhost:5000/login",
+        url: url + "/login",
         data: {
             email: document.getElementById("lemail").value,
             password: document.getElementById("lpassword").value
@@ -55,7 +60,7 @@ function Login() {
 function Profile() {
     axios({
         method: 'get',
-        url: "http://localhost:5000/profile"
+        url: url + "/profile"
     })
         .then((response) => {
             document.getElementById("pname").innerHTML = response.data.profile.name,
@@ -69,7 +74,7 @@ function Profile() {
 function ForgotOne() {
     axios({
         method: 'post',
-        url: "http://localhost:5000/forgot-password",
+        url: url + "/forgot-password",
         data: {
             email: document.getElementById("f1email").value
         }, withCredentials: true
@@ -92,11 +97,11 @@ function ForgotOne() {
 function ForgotTwo() {
     axios({
         method: 'post',
-        url: "http://localhost:5000//forgot-password-step2",
+        url: url + "/forgot-password-step2",
         data: {
             email: document.getElementById("f2email").value,
             otp: document.getElementById("f2otp").value,
-            password: document.getElementById("f2password").value
+            newPassword: document.getElementById("f2password").value
         }, withCredentials: true
     })
         .then((response) => {
@@ -117,7 +122,7 @@ function ForgotTwo() {
 function tweetPost() {
     axios({
         method: 'post',
-        url: "http://localhost:5000/tweet",
+        url: url + "/tweet",
         data: {
             tweet: document.getElementById("tweet").value
         }
@@ -139,7 +144,7 @@ function getTweet() {
     getProfile();
     axios({
         method: 'get',
-        url: "http://localhost:5000/tweet-get",
+        url: url + "/tweet-get",
         credentials: 'include'
     })
         .then((response) => {
@@ -164,7 +169,7 @@ function getTweet() {
 function myTweet() {
     axios({
         method: 'get',
-        url: "http://localhost:5000/myTweets",
+        url: url + "/myTweets",
         credentials: 'include'
     })
         .then((response) => {
@@ -218,7 +223,7 @@ socket.on("MY_POST", (newPost) => {
 function getProfile() {
     axios({
         method: 'get',
-        url: "http://localhost:5000/profile"
+        url: url + "/profile"
     })
         .then((response) => {
             document.getElementById("tname").innerHTML = response.data.profile.name,
@@ -229,7 +234,7 @@ function getProfile() {
 function Logout() {
     axios({
         method: 'post',
-        url: "http://localhost:5000/logout"
+        url: url + "/logout"
     })
         .then((response) => {
             if (response.data.status === 200) {

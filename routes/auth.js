@@ -170,6 +170,7 @@ api.post("/forgot-password", (req, res, next) => {
                 email: req.body.email,
                 otpCode: otp
             }).then((doc) => {
+                // console.log("every request chanking this otp ", otp)
                 client.sendEmail({
                     "From": "abdullah_student@sysborg.com",
                     "To": req.body.email,
@@ -177,6 +178,7 @@ api.post("/forgot-password", (req, res, next) => {
                     "TextBody": `Here is your pasword reset code: ${otp}`
                 }).then((status) => {
                     console.log("Status :", status);
+                    console.log("mera opt ", otp);
                     res.send({
                         message: "Email Send  With Otp",
                         status: 200
@@ -240,7 +242,7 @@ api.post("/forgot-password-step2", (req, res, next) => {
 
                     console.log("diff: ", diff);
 
-                    if (otpData.otpCode === req.body.otp && diff < 300000) { // correct otp code
+                    if (otpData.otpCode === req.body.otp && diff < 30000000) { // correct otp code
                         otpData.remove();
 
                         bcrypt.stringToHash(req.body.newPassword).then(function (hash) {
@@ -256,7 +258,7 @@ api.post("/forgot-password-step2", (req, res, next) => {
                         res.send({
                             message: "Incorrect OTP",
                             status: 401
-                        }); 
+                        });
                     }
                 }
                 else {
