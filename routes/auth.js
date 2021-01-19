@@ -108,7 +108,7 @@ api.post("/login", (req, res, next) => {
 
                     res.send({
                         message: "Login Success",
-                        status:200,
+                        status: 200,
                         user: {
                             name: data.name,
                             email: data.email,
@@ -142,7 +142,10 @@ api.post("/logout", (req, res, next) => {
         maxAge: 86_400_000,
         httpOnly: true
     });
-    res.send("Logout Success");
+    res.send({
+        message: "Logout Success",
+        status: 200
+    });
 });
 
 api.post("/forgot-password", (req, res, next) => {
@@ -175,7 +178,8 @@ api.post("/forgot-password", (req, res, next) => {
                 }).then((status) => {
                     console.log("Status :", status);
                     res.send({
-                        message: "Email Send  With Otp"
+                        message: "Email Send  With Otp",
+                        status: 200
                     });
                 }).catch((err) => {
                     console.log("error in creating otp: ", err);
@@ -201,7 +205,7 @@ api.post("/forgot-password", (req, res, next) => {
     });
 });
 
-api.post("//forgot-password-step2", (req, res, next) => {
+api.post("/forgot-password-step2", (req, res, next) => {
     if (!req.body.email || !req.body.otp || !req.body.newPassword) {
         res.send({
             message: "Please required Email, Otp & New Password",
@@ -217,6 +221,7 @@ api.post("//forgot-password-step2", (req, res, next) => {
             });
         }
         else if (user) {
+            console.log("Check user : ", user);
             otpModel.find({ email: req.body.email }, function (err, otpData) {
                 if (err) {
                     res.send({
@@ -240,19 +245,24 @@ api.post("//forgot-password-step2", (req, res, next) => {
 
                         bcrypt.stringToHash(req.body.newPassword).then(function (hash) {
                             user.update({ password: hash }, {}, function (err, data) {
-                                res.send("password updated");
+                                res.send({
+                                    message: "Password Updated",
+                                    status: 200
+                                });
                             });
                         });
                     }
                     else {
-                        res.status(401).send({
-                            message: "incorrect otp"
-                        });
+                        res.send({
+                            message: "Incorrect OTP",
+                            status: 401
+                        }); 
                     }
                 }
                 else {
-                    res.status(401).send({
-                        message: "incorrect otp"
+                    res.send({
+                        message: "Incorrect OTP",
+                        status: 401
                     });
                 }
             });

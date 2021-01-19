@@ -45,7 +45,15 @@ var otpSchema = new mongoose.Schema({
 
 var otpModel = mongoose.model("otp", otpSchema);
 
+var tweetSchema = new mongoose.Schema({
+    "username": String,
+    "tweet": String
+});
+
+var tweetModel = mongoose.model("tweet", tweetSchema);
+
 module.exports = {
     userModel: userModel,
     otpModel: otpModel,
+    tweetModel: tweetModel
 }
