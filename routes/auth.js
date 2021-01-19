@@ -7,7 +7,7 @@ var postmork = require("postmark")
 var { SERVER_SECRET } = require("../core/app");
 const { response } = require("express");
 
-var client = new postmork.Client("35cebacb-d58e-403b-aa4d-34d8cab6c422");
+var client = new postmork.Client("xxxxxxxxxxxxx");
 
 api.post("/signup", (req, res, next) => {
     // if (!req.body.name || !req.body.email || !req.body.password || !req.body.phone || !req.body.gender) {
