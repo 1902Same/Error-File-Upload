@@ -10,12 +10,46 @@ var path = require('path');
 var http = require('http');
 const favicons = require('favicons');
 var socketIO = require('socket.io');
+const fs = require("fs");
 
-// console.log("module: ", userModel);
 var { SERVER_SECRET } = require("./core/app");
 var { userModel, tweetModel } = require("./dbrepo/models");
 var authRoutes = require("./routes/auth");
 const { createServer } = require("http");
+
+//==========================================================================================
+const multer = require("multer");
+const storage = multer.diskStorage({ // https://www.npmjs.com/package/multer#diskstorage
+    destination: './uploads/',
+    filename: function (req, file, cb) {
+        cb(null, `${new Date().getTime()}-${file.filename}.${file.mimetype.split("/")[1]}`)
+    }
+});
+var upload = multer({ storage: storage });
+
+//==========================================================================================
+
+const admin = require("firebase-admin");
+// https://firebase.google.com/docs/storage/admin/start
+var serviceAccount = {
+    "type": "xxxxx",
+    "project_id": "xxxxx",
+    "private_key_id": "xxxxx",
+    "private_key": "xxxxx",
+    "client_email": "xxxxx",
+    "client_id": "xxxxx",
+    "auth_uri": "xxxxx",
+    "token_uri": "xxxxx",
+    "auth_provider_x509_cert_url": "xxxxx",
+    "client_x509_cert_url": "xxxxx"
+}
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "xxxxx",
+});
+const bucket = admin.storage().bucket("xxxxx"); // Firebase bucket Link
+//==========================================================================================
 
 var app = express();
 var server = http.createServer(app);
@@ -179,6 +213,73 @@ app.get("/myTweets", (req, res, next) => {
             });
         }
     });
+});
+
+app.post("/upload", upload.any(), (req, res, next) => {
+
+    console.log("req.body : ", req.body);
+    console.log("req.bdoy : ", JSON.parse(req.body.myDetails));
+    console.log("req.files : ", req.files);
+
+    console.log("Upload file name: ", req.files[0].originalname);
+    console.log("File type : ", req.files[0].mimetype);
+    console.log("File name in server folder : ", req.files[0].filename);
+    console.log("File path in server folder : ", req.files[0].path);
+
+    // https://googleapis.dev/nodejs/storage/latest/Bucket.html#upload-examples
+    bucket.upload(
+        req.files[0].path,
+        // {
+        //     destination: `${new Date().getTime()}-new-image.png`, // give destination name if you want to give a certain name to file in bucket, include date to make name unique otherwise it will replace previous file with the same name
+        // },
+        function (err, file, apiResponse) {
+            if (!err) {
+                // console.log("api resp: ", apiResponse);
+
+                // https://googleapis.dev/nodejs/storage/latest/Bucket.html#getSignedUrl
+                file.getSignedUrl({
+                    action: 'read',
+                    expires: '03-09-2491'
+                })
+                    .then((urlData, err) => {
+                        if (!err) {
+                            console.log("Public downloadable url : ", urlData[0]); // this is public downloadable url 
+                            userModel.findOne({ email: req.body.email }, (err, user) => {
+                                console.log("Yahan dekho",req.body.emailer);
+                                if (!err) {
+                                    user.update({ profilePic: urlData[0] }, {}, function (err, data) {
+                                        // console.log("Yahan dekho",user);
+                                        res.send({
+                                            profilePic: user.profilePic
+                                        });
+                                    })
+                                }
+                                else {
+                                    res.send({
+                                        message: "error"
+                                    });
+                                }
+                            })
+                            try {
+                                fs.unlinkSync(req.files[0].path)
+                                //file removed
+                            } catch (err) {
+                                console.error(err)
+                            }
+                            // res.send({
+                            //     message: "OK Done!",
+                            //     file: urlData[0]
+                            // });
+                        }
+                    })
+            }
+            else {
+                console.log("Error : ", err);
+                res.send({
+                    status: 500
+                });
+            }
+        });
 });
 
 server.listen(PORT, () => {

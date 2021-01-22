@@ -46,6 +46,16 @@
                 <button type="button" onclick="Logout()" class="btn btn-outline-success">LOG OUT</button>
             </div>
         </div>
+
+        <div class="row">
+            <form onsubmit="return Upload()">
+                <!-- dont get confused with return keyword inside onsubmit, it is there to prevent html page to reload/default behaviour, and this have nothing to do with actual file upload process but if you remove it page will reload on submit -->
+                <img src="451-4517876_default-profile-hd-png-download.png" id="profilePic" style="border-radius: 50%; width: 100px;">
+                <input required type="file" id="fileInput" onchange="previewFile()">
+                <button type="submit"> Upload </button>
+            </form>
+        </div>
+
         <div class="row">
             <div class="input-group mb-3" style="width: 60%;margin: 0 auto; top:80px ;">
                 <input type="text" class="form-control" placeholder="Write Tweet" aria-label="Recipient's username"

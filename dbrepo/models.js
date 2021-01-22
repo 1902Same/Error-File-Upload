@@ -31,6 +31,7 @@ var userSchema = new mongoose.Schema({
     "password": String,
     "phone": String,
     "gender": String,
+    "profilePic": String,
     "createdOn": { "type": Date, "default": Date.now },
     "activeSince": Date
 });
