@@ -28,10 +28,38 @@
         li {
             flex: 0 0 auto;
         }
+
+        .file-upload {
+            height: 170px;
+            width: 170px;
+            margin: 40px auto;
+            border: 1px solid #f0c0d0;
+            border-radius: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .file-upload input {
+            position: absolute;
+            height: 400px;
+            width: 400px;
+            left: -200px;
+            top: -200px;
+            background: transparent;
+            opacity: 0;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+            filter: alpha(opacity=0);
+        }
+
+        .file-upload img {
+            height: 170px;
+            width: 170px;
+
+        }
     </style>
 </head>
 
-<body onload="getTweet(); myTweet();">
+<body onload="getProfile(); getTweet();">
 
     <div class="container-fluid">
         <div class="row">
@@ -48,20 +76,30 @@
         </div>
 
         <div class="row">
-            <form onsubmit="return Upload()">
-                <!-- dont get confused with return keyword inside onsubmit, it is there to prevent html page to reload/default behaviour, and this have nothing to do with actual file upload process but if you remove it page will reload on submit -->
-                <img src="451-4517876_default-profile-hd-png-download.png" id="profilePic" style="border-radius: 50%; width: 100px;">
-                <input required type="file" id="fileInput" onchange="previewFile()">
-                <button type="submit"> Upload </button>
-            </form>
+            <div class="col">
+                <form onsubmit="return Upload()">
+                    <div class="file-upload">
+                        <!--place upload image/icon first !-->
+                        <img src="images/dy62M.png" id="profilePic" />
+                        <!--place input file last !-->
+                        <input type="file" onchange="previewFile()" id="fileInput" required />
+                        <br>
+
+                    </div>
+                    <center> <button type="submit" class="btn btn-outline-success"> Upload </button></center>
+                </form>
+            </div>
         </div>
 
         <div class="row">
-            <div class="input-group mb-3" style="width: 60%;margin: 0 auto; top:80px ;">
-                <input type="text" class="form-control" placeholder="Write Tweet" aria-label="Recipient's username"
-                    aria-describedby="button-addon2" id="tweet">
-                <button class="btn btn-outline-success" type="button" onclick="tweetPost()">POST</button>
-            </div>
+            <form onsubmit="return tweetPost()">
+                <div class="input-group mb-3" style="width: 60%;margin: 0 auto; top:80px ;">
+                    <input type="text" class="form-control" placeholder="Write Tweet" aria-label="Recipient's username"
+                        aria-describedby="button-addon2" id="tweet">
+                    <input type="submit" class=" btn btn-outline-success" value="POST"></input>
+
+                </div>
+            </form>
         </div>
 
         <div class="row">
@@ -79,7 +117,7 @@
                 <div class="col">
                     <div class="collapse multi-collapse" id="multiCollapseExample1">
                         <div class="card card-body">
-                            <ol id="getAllTweet">
+                            <ol id="myTweet">
 
                             </ol>
                         </div>
@@ -88,7 +126,7 @@
                 <div class="col">
                     <div class="collapse multi-collapse" id="multiCollapseExample2">
                         <div class="card card-body">
-                            <ol id="myTweet">
+                            <ol id="getAllTweet">
                             </ol>
                         </div>
                     </div>

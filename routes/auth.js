@@ -32,7 +32,6 @@ api.post("/signup", (req, res, next) => {
                     "password": hash,
                     "phone": req.body.phone,
                     "gender": req.body.gender,
-                    "profilePic": ""
                 });
                 newUser.save((err, data) => {
                     // console.log(data);
