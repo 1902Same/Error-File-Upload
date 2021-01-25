@@ -15,7 +15,7 @@ const fs = require("fs");
 var { SERVER_SECRET } = require("./core/app");
 var { userModel, tweetModel } = require("./dbrepo/models");
 var authRoutes = require("./routes/auth");
-const { createServer } = require("http");
+// const { createServer } = require("http");
 
 //==========================================================================================
 const multer = require("multer");
@@ -31,24 +31,13 @@ var upload = multer({ storage: storage });
 
 const admin = require("firebase-admin");
 // https://firebase.google.com/docs/storage/admin/start
-var serviceAccount = {
-    "type": "xxxxx",
-    "project_id": "xxxxx",
-    "private_key_id": "xxxxx",
-    "private_key": "xxxxx",
-    "client_email": "xxxxx",
-    "client_id": "xxxxx",
-    "auth_uri": "xxxxx",
-    "token_uri": "xxxxx",
-    "auth_provider_x509_cert_url": "xxxxx",
-    "client_x509_cert_url": "xxxxx"
-}
+var serviceAccount = {};
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "xxxxx",
+    databaseURL: "",
 });
-const bucket = admin.storage().bucket("xxxxx"); // Firebase bucket Link
+const bucket = admin.storage().bucket(""); // Firebase bucket Link
 //==========================================================================================
 
 var app = express();
@@ -91,6 +80,8 @@ app.use(function (req, res, next) {
                     id: decodeData.id,
                     name: decodeData.name,
                     email: decodeData.email,
+                    phone: decodeData.phone,
+                    gender: decodeData.gender
                 }, SERVER_SECRET)
                 res.cookie('jTocken', tocken, {
                     maxAge: 86_400_000,
@@ -101,7 +92,10 @@ app.use(function (req, res, next) {
             }
         }
         else {
-            res.status(401).send("invalid token")
+            res.send({
+                message: "invalid token",
+                status: 401
+            })
         }
     });
 });
@@ -179,38 +173,11 @@ app.get("/tweet-get", (req, res, next) => {
                 status: 404
             })
         }
-        else if (data) {
-            res.send({
-                gettweet: data,
-                status: 200
-            });
-        }
         else {
-            res.send({
-                message: "User not found"
-            });
-        }
-    });
-});
-
-app.get("/myTweets", (req, res, next) => {
-    console.log(req.body.jTocken.name);
-
-    tweetModel.find({ username: req.body.jTocken.name }, (err, data) => {
-        if (!err) {
-            console.log("Tweet Data : ", data);
-            res.send({
-                tweet: data,
-                status: 200
-            });
-            io.emit("MY_POST", data);
-        }
-        else {
-            console.log("Error : ", err);
-            res.send({
-                message: "Error",
-                status: 500
-            });
+            console.log(data)
+            req.body.data = data
+            // data = data[data.length -1]
+            res.send(data)
         }
     });
 });
@@ -245,12 +212,12 @@ app.post("/upload", upload.any(), (req, res, next) => {
                         if (!err) {
                             console.log("Public downloadable url : ", urlData[0]); // this is public downloadable url 
                             userModel.findOne({ email: req.body.email }, (err, user) => {
-                                console.log("Yahan dekho",req.body.emailer);
+                                console.log("Yahan dekho", user);
                                 if (!err) {
                                     user.update({ profilePic: urlData[0] }, {}, function (err, data) {
                                         // console.log("Yahan dekho",user);
                                         res.send({
-                                            profilePic: user.profilePic
+                                            pic: user.profilePic
                                         });
                                     })
                                 }
