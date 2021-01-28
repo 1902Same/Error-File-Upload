@@ -59,7 +59,7 @@
     </style>
 </head>
 
-<body onload="getProfile(); getTweet();">
+<body onload="getProfile(); getTweet(); ">
 
     <div class="container-fluid">
         <div class="row">
@@ -78,15 +78,20 @@
         <div class="row">
             <div class="col">
                 <form onsubmit="return Upload()">
+                    <!-- dont get confused with return keyword inside onsubmit, 
+                it is there to prevent html page to reload/default behaviour,
+                and this have nothing to do with actual file upload process 
+                but if you remove it page will reload on submit -->
                     <div class="file-upload">
                         <!--place upload image/icon first !-->
-                        <img src="images/dy62M.png" id="profilePic" />
+                        <img src="451-4517876_default-profile-hd-png-download.png" id="show_pic" />
                         <!--place input file last !-->
                         <input type="file" onchange="previewFile()" id="fileInput" required />
                         <br>
 
                     </div>
                     <center> <button type="submit" class="btn btn-outline-success"> Upload </button></center>
+
                 </form>
             </div>
         </div>
@@ -97,7 +102,6 @@
                     <input type="text" class="form-control" placeholder="Write Tweet" aria-label="Recipient's username"
                         aria-describedby="button-addon2" id="tweet">
                     <input type="submit" class=" btn btn-outline-success" value="POST"></input>
-
                 </div>
             </form>
         </div>
@@ -132,8 +136,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
     <script src="js/index.js"></script>

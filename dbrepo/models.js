@@ -29,7 +29,7 @@ var userSchema = new mongoose.Schema({
     "name": String,
     "email": String,
     "password": String,
-    "phone": String,
+    "number": String,
     "gender": String,
     "profilePic": String,
     "createdOn": { "type": Date, "default": Date.now },

@@ -44,6 +44,7 @@ function Login() {
     })
         .then((response) => {
             if (response.data.status === 200) {
+                sessionStorage.setItem("email", document.getElementById("lemail").value)
                 alert(response.data.message);
                 window.location.href = "tweet.html"
             }
@@ -114,16 +115,26 @@ function getProfile() {
         .then((response) => {
             document.getElementById("tname").innerHTML = response.data.profile.name,
                 document.getElementById("temail").innerHTML = response.data.profile.email,
-                document.getElementById("profilePic").innerHTML = response.data.profile.profilePic
+                document.getElementById("show_pic").src = response.data.profile.profilePic
         })
         .catch(function (error) {
             console.log(error);
         });
+    return false;
 }
-
 function Upload() {
 
     var fileInput = document.getElementById("fileInput");
+
+    // // To convert a File into Blob (not recommended)
+    // var blob = null;
+    // var file = fileInput.files[0];
+    // let reader = new FileReader();
+    // reader.readAsArrayBuffer(file)
+    // reader.onload = function (e) {
+    //     blob = new Blob([new Uint8Array(e.target.result)], { type: file.type });
+    //     console.log(blob);
+    // }
 
     console.log("fileInput: ", fileInput);
     console.log("fileInput: ", fileInput.files[0]);
@@ -140,6 +151,7 @@ function Upload() {
             "year": "2021"
         })
     );
+
     // you may use any other library to send from-data request to server, I used axios for no specific reason, I used it just because I'm using it these days, earlier I was using npm request module but last week it get fully depricated, such a bad news.
     axios({
         method: 'post',
@@ -148,14 +160,54 @@ function Upload() {
         headers: { 'Content-Type': 'multipart/form-data' }
     })
         .then(res => {
-            alert("Upload");
+            console.log(`  upload Success`);
+            alert("upload Success")
+            // document.getElementById("show_pic").innerHTML = instanceOfFileReader.readAsDataURL(res.data);
+
+
         })
         .catch(err => {
             console.log(err);
         })
 
     return false; // dont get confused with return false, it is there to prevent html page to reload/default behaviour, and this have nothing to do with actual file upload process but if you remove it page will reload on submit -->
+
 }
+// function Upload() {
+
+//     var fileInput = document.getElementById("fileInput");
+
+//     console.log("fileInput: ", fileInput);
+//     console.log("fileInput: ", fileInput.files[0]);
+
+//     let formData = new FormData();
+//     // https://developer.mozilla.org/en-US/docs/Web/API/FormData/append#syntax
+
+//     formData.append("myFile", fileInput.files[0]); // file input is for browser only, use fs to read file in nodejs client
+//     // formData.append("myFile", blob, "myFileNameAbc"); // you can also send file in Blob form (but you really dont need to covert a File into blob since it is Actually same, Blob is just a new implementation and nothing else, and most of the time (as of january 2021) when someone function says I accept Blob it means File or Blob) see: https://stackoverflow.com/questions/33855167/convert-data-file-to-blob
+//     formData.append("email", sessionStorage.getItem("email")); // this is how you add some text data along with file
+//     formData.append("myDetails",
+//         JSON.stringify({
+//             "subject": "Science",   // this is how you send a json object along with file, you need to stringify (ofcourse you need to parse it back to JSON on server) your json Object since append method only allows either USVString or Blob(File is subclass of blob so File is also allowed)
+//             "year": "2021"
+//         })
+//     );
+//     // you may use any other library to send from-data request to server, I used axios for no specific reason, I used it just because I'm using it these days, earlier I was using npm request module but last week it get fully depricated, such a bad news.
+//     axios({
+//         method: 'post',
+//         url: url + "/upload",
+//         data: formData,
+//         headers: { 'Content-Type': 'multipart/form-data' }
+//     })
+//         .then(res => {
+//             alert("Upload Success");
+//         })
+//         .catch(err => {
+//             console.log(err);
+//         })
+
+//     return false; // dont get confused with return false, it is there to prevent html page to reload/default behaviour, and this have nothing to do with actual file upload process but if you remove it page will reload on submit -->
+// }
 
 function tweetPost() {
     axios({
@@ -163,14 +215,14 @@ function tweetPost() {
         url: url + "/tweet",
         data: {
             tweet: document.getElementById("tweet").value
-        }
+        }, withCredentials: true
     })
         .then((response) => {
             console.log(response.data.data.username);
-            document.getElementById('mytweet').innerHTML += `
+            document.getElementById('myTweet').innerHTML += `
             <div class="posts">
                 <h4>${response.data.data.username}</h4>
-                <p>${response.data.data.tweet}</p>
+                <p class="noteCard">${response.data.data.tweet}</p>
             </div>`
         })
         .catch(function (error) {
@@ -187,7 +239,7 @@ function getTweet() {
         credentials: 'include',
     }).then((response) => {
         let tweets = response.data;
-        let html = ""
+        let html = "";
         tweets.forEach(element => {
             html += `
             <div class="posts">
@@ -198,14 +250,14 @@ function getTweet() {
         });
         document.getElementById('getAllTweet').innerHTML = html;
 
-        let userTweet = response.data
-        let userHtml = ""
+        let userTweet = response.data;
+        let userHtml = "";
 
         userTweet.forEach(element => {
             if (element.username == response.data.username) {
                 userHtml += `
                 <div class="posts">
-                <h4>${element.usernmae}</h4>
+                <h4>${element.username}</h4>
                 <p class="noteCard">${element.tweet}</p>
                 </div>`
             }
@@ -218,29 +270,27 @@ function getTweet() {
     return false
 }
 
-socket.on("NEW_POST", (newPost) => {
-    console.log("New Post : ", newPost);
-    let jsonRes = newPost;
-    var eachTweet = document.createElement("li");
-    eachTweet.innerHTML = `
-    <h4>
-        ${jsonRes.username}
-    </h4>
-    <p>
-        ${jsonRes.tweet}
-    </p>`
-    document.getElementById("myTweet").appendChild(eachTweet);
+socket.on('NEW_POST', (newPost) => {
+    console.log(newPost)
+    let tweets = newPost;
+    document.getElementById('getAllTweet').innerHTML += `
+    <div class="posts">
+    <h4>${tweets.username}</h4>
+    <p>${tweets.tweet}</p>
+    </div>
+    `
 })
 
 function previewFile() {
     const preview = document.querySelector('img');
-    const file = document.querySelector('input[type = file]').files[0];
+    const file = document.querySelector('input[type=file]').files[0];
     const reader = new FileReader();
 
     reader.addEventListener("load", function () {
-        // Conver image file to base64
+        // convert image file to base64 string
         preview.src = reader.result;
     }, false);
+
     if (file) {
         reader.readAsDataURL(file);
     }

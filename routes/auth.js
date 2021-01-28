@@ -30,8 +30,8 @@ api.post("/signup", (req, res, next) => {
                     "name": req.body.name,
                     "email": req.body.email,
                     "password": hash,
-                    "phone": req.body.phone,
-                    "gender": req.body.gender,
+                    "number": req.body.number,
+                    "gender": req.body.gender
                 });
                 newUser.save((err, data) => {
                     // console.log(data);
@@ -96,7 +96,7 @@ api.post("/login", (req, res, next) => {
                         id: data._id,
                         name: data.name,
                         email: data.email,
-                        phone: data.phone,
+                        number: data.number,
                         gender: data.gender,
                         // ip: req.connection.remoteAddress
                     }, SERVER_SECRET)
@@ -112,7 +112,7 @@ api.post("/login", (req, res, next) => {
                         user: {
                             name: data.name,
                             email: data.email,
-                            phone: data.phone,
+                            number: data.number,
                             gender: data.gender,
                         },
                     });
@@ -121,7 +121,7 @@ api.post("/login", (req, res, next) => {
                     console.log("Password not matched");
                     res.send({
                         message: "Incorrect Password",
-                        status: 409
+                        status: 401
                     });
                 }
             }).catch(e => {
