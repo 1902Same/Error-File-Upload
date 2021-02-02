@@ -1,4 +1,6 @@
-const url = "http://localhost:5000";
+// const url = "http://localhost:5000";
+const url = "https://my-twitter-apps.herokuapp.com";
+
 var socket = io(url);
 
 
@@ -114,11 +116,12 @@ function getProfile() {
     })
         .then((response) => {
             document.getElementById("tname").innerHTML = response.data.profile.name,
-                document.getElementById("temail").innerHTML = response.data.profile.email,
-                document.getElementById("show_pic").src = response.data.profile.profilePic
+            sessionStorage.setItem("name", response.data.profile.name);
+            document.getElementById("temail").innerHTML = response.data.profile.email,
+            document.getElementById("show_pic").src = response.data.profile.profilePic
         })
         .catch(function (error) {
-            console.log(error);
+            console.log(error.message);
         });
     return false;
 }
@@ -253,8 +256,10 @@ function getTweet() {
         let userTweet = response.data;
         let userHtml = "";
 
+        console.log("Check :", sessionStorage.getItem("name"));
         userTweet.forEach(element => {
-            if (element.username == response.data.username) {
+
+            if (element.username === sessionStorage.getItem("name")) {
                 userHtml += `
                 <div class="posts">
                 <h4>${element.username}</h4>
